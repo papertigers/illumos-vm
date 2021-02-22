@@ -110,7 +110,7 @@ async function setup(nat, mem) {
         },
         stderr: (s) => {
           // for debugging the failed attach
-          core.error(s);
+          core.error(s.toString());
         }
       }
     });
