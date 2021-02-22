@@ -1,0 +1,25 @@
+name: 'illumos-vm'
+description: 'Run CI on illumos for GitHub Actions'
+inputs:
+  prepare:
+    description: 'Install some tools before CI runs'
+    required: false
+  run:
+    description: 'The CI command to run'
+    required: true
+  envs:
+    description: 'The envs to pass into FreeBSD vm'
+    required: false
+  mem:
+    description: 'Set the memory size of the vm'
+    required: false
+  nat:
+    description: 'The NAT ports to FreeBSD vm'
+    required: false
+branding:
+  icon: 'activity'
+  color: 'green'
+
+runs:
+  using: 'node12'
+  main: 'index.js'

@@ -1,0 +1,39 @@
+
+name: Test
+
+on: [push]
+
+jobs:
+  testfreebsd:
+    runs-on: macos-latest
+    name: A job to run test FreeBSD
+    env:
+      MYTOKEN : ${{ secrets.MYTOKEN }}
+      MYTOKEN2: "value2"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Test on illumos
+      id: test
+      uses: papertigers/illumos-vm@main
+      with:
+        envs: 'MYTOKEN MYTOKEN2'
+        prepare: pkg install -y curl
+        mem: 2048
+        nat: |
+          "8080": "80"
+          "8443": "443"
+          udp:"8081": "80"
+        run: |
+          if [ -n "test" ]; then
+            echo "false"
+          fi
+          if [ "test" ]; then
+            echo "test"
+          fi
+          pwd
+          ls -lah
+          whoami
+          env
+          prtdiag -v
+          svcs -a
+          echo "OK"
