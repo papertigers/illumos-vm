@@ -93,7 +93,8 @@ async function setup(nat, mem) {
 
     let workingDir = __dirname;
 
-    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.2/omnios-r151036.7z";
+    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.3/omnios-r151036.7z";
+    let surl = "http://lightsandshapes.com/sercons";
 
     core.info("Downloading image: " + url);
     let img = await tc.downloadTool(url);
@@ -103,9 +104,18 @@ async function setup(nat, mem) {
     await io.mv(img, s7z);
     await exec.exec("7z e " + s7z + "  -o" + workingDir);
 
-    mdataScript = workingDir + "/build-metadata.sh"
+    let mdataScript = workingDir + "/build-metadata.sh"
     await exec.exec("chmod +x " + mdataScript);
     await exec.exec(mdataScript);
+
+    // overwrite sercons for testing
+    core.info("Downloading sercons: " + surl);
+    let s = await tc.downloadTool(surl);
+    core.info("Downloaded file: " + s);
+    await io.mv(s, path.join(workingDir, "sercons"));
+
+    let sercons = path.join(workingDir, "sercons");
+    await exec.exec("chmod +x " + sercons);
 
     let sshHome = path.join(process.env["HOME"], ".ssh");
     fs.appendFileSync(path.join(sshHome, "config"),
@@ -118,6 +128,7 @@ async function setup(nat, mem) {
 
 
     let vmName = "omnios";
+    await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 file /tmp/omnios.com1");
 
     if (nat) {
       let nats = nat.split("\n").filter(x => x !== "");
@@ -161,9 +172,8 @@ async function setup(nat, mem) {
     await vboxmanage(vmName, "startvm", " --type headless");
 
     core.info("First boot");
+    await exec.exec(sercons + " /tmp/omnios.com1");
 
-    let loginTag = "omnios console login:";
-    await waitFor(vmName, loginTag);
 
     // Finally execute the runner workflow
     let cmd1 = "mkdir -p /Users/runner/work && ln -s /Users/runner/work/  work";

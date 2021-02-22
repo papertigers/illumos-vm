@@ -23,6 +23,11 @@ set -o xtrace
     -e '/^PATH=/s#\$#:/opt/ooce/bin:/opt/ooce/sbin#' \\
     /etc/default/login
 /bin/ntpdig -S 0.pool.ntp.org || true
+
+# break out of sercons?
+(
+    echo -ne '\r\nVM is read ~*~*'
+) >/dev/msglog
 exit 0
 EOF
 
