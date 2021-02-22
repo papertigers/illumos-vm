@@ -19,18 +19,10 @@ set -o errexit
 set -o pipefail
 set -o xtrace
 
-echo 'Just a moment...' >/dev/msglog
 /bin/sed -i \\
     -e '/^PATH=/s#\$#:/opt/ooce/bin:/opt/ooce/sbin#' \\
     /etc/default/login
 /bin/ntpdig -S 0.pool.ntp.org || true
-(
-    echo
-    echo
-    banner 'Welcome to OmniOS!'
-    echo
-    echo
-) >/dev/msglog
 exit 0
 EOF
 

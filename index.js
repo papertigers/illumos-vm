@@ -75,11 +75,16 @@ async function vboxmanage(vmName, cmd, args = "") {
 async function setup(nat, mem) {
   try {
 
-    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), "Host omnios " + "\n");
-    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), " User root" + "\n");
-    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), " HostName localhost" + "\n");
-    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), " Port 2222" + "\n");
-    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), "StrictHostKeyChecking=accept-new\n");
+    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
+        "Host omnios " + "\n");
+    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
+        " User root" + "\n");
+    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
+        " HostName localhost" + "\n");
+    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
+        " Port 2222" + "\n");
+    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
+        "StrictHostKeyChecking=accept-new\n");
 
 
     await exec.exec("brew install -qf truncate", [], { silent: true });
@@ -102,22 +107,9 @@ async function setup(nat, mem) {
     await exec.exec("chmod +x " + mdataScript);
     await exec.exec(mdataScript);
 
-    cpio = workingDir + "/ILLUMOSVM_TMP/metadata.img"
-    let mdataDisk = "";
-    await exec.exec("hdiutil", ['attach', '-nomount', '-noverify', cpio], {
-      listeners: {
-        stdout: (s) => {
-          mdataDisk += s;
-        },
-        stderr: (s) => {
-          // for debugging the failed attach
-          core.error(s.toString());
-        }
-      }
-    });
-
     let sshHome = path.join(process.env["HOME"], ".ssh");
-    fs.appendFileSync(path.join(sshHome, "config"), "SendEnv   CI  GITHUB_* \n");
+    fs.appendFileSync(path.join(sshHome, "config"),
+        "SendEnv   CI  GITHUB_* \n");
     await exec.exec("chmod 700 " + sshHome);
 
 
@@ -137,22 +129,28 @@ async function setup(nat, mem) {
           let proto = segs[0].trim().trim('"');
           let hostPort = segs[1].trim().trim('"');
           let vmPort = segs[2].trim().trim('"');
-          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," + proto + ",," + hostPort + ",," + vmPort + "'");
+          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
+            proto + ",," + hostPort + ",," + vmPort + "'");
 
         } else if (segs.length === 2) {
           let proto = "tcp"
           let hostPort = segs[0].trim().trim('"');
           let vmPort = segs[1].trim().trim('"');
-          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," + proto + ",," + hostPort + ",," + vmPort + "'");
+          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
+            proto + ",," + hostPort + ",," + vmPort + "'");
         }
       };
     }
 
 
-    let mdataVmdk = workingDir + "/cpio.vmdk";
+    let mdataVmdk = workingDir + "/ILLUMOSVM_TMP/cpio.vmdk";
+    let cpio = workingDir + "/ILLUMOSVM_TMP/metadata.img"
     // attach the illumos metadata-agent cpio archive to seed the guest VM
-    await vboxmanage("", "internalcommands", "  createrawvmdk -filename " + mdataVmdk + " -rawdisk " + mdataDisk.toString().trim());
-    await vboxmanage(vmName, "storageattach", "  --storagectl SATA --port 1 --device 0 --type hdd --medium " + mdataVmdk);
+    await vboxmanage("", "internalcommands", "  createrawvmdk -filename " +
+        mdataVmdk + " -rawdisk " + cpio);
+    await vboxmanage(vmName, "storageattach",
+        "  --storagectl SATA --port 1 --device 0 --type hdd --medium " +
+        mdataVmdk);
 
     if (mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
@@ -194,7 +192,8 @@ async function main() {
   var envs = core.getInput("envs");
   console.log("envs:" + envs);
   if (envs) {
-    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), "SendEnv " + envs + "\n");
+    fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
+        "SendEnv " + envs + "\n");
   }
 
   var prepare = core.getInput("prepare");
