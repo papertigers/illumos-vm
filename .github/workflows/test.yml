@@ -17,7 +17,7 @@ jobs:
       uses: papertigers/illumos-vm@main
       with:
         envs: 'MYTOKEN MYTOKEN2'
-        prepare: pkg install -y curl
+        prepare: uname -a
         mem: 2048
         nat: |
           "8080": "80"

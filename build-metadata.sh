@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# TODO add error handling
+set -xe
 
+# TODO add error handling
 TOP=$(cd "$(dirname "$0")" && pwd)
 
 mkdir "$TOP/ILLUMOSVM_TMP"
@@ -9,6 +10,7 @@ mkdir -p "$HOME/.ssh"
 ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -q -N ""
 
 mkdir -p "$TOP/ILLUMOSVM/cpio"
+cat "$HOME/.ssh/id_rsa.pub" > "$HOME/.ssh/authorized_keys"
 cp "$HOME/.ssh/authorized_keys" "$TOP/ILLUMOSVM/cpio/authorized_keys"
 
 cat >"$TOP/ILLUMOSVM/cpio/firstboot.sh" <<EOF
@@ -36,4 +38,6 @@ echo omnios > "$TOP/ILLUMOSVM/cpio/nodename"
 cd "$TOP/ILLUMOSVM/cpio"
 # macOS seems to want the dmg extension...
 find . -type f | cpio --quiet -o -O "$TOP/ILLUMOSVM_TMP/metadata.dmg"
+ls -lh "$TOP/ILLUMOSVM_TMP/metadata.dmg"
+file "$TOP/ILLUMOSVM_TMP/metadata.dmg"
 cd "$TOP"

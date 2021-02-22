@@ -103,10 +103,14 @@ async function setup(nat, mem) {
 
     cpio = workingDir + "/ILLUMOSVM_TMP/metadata.dmg"
     let mdataDisk = "";
-    await exec.exec("hdiutil attach -nomount -noverify " + cpio, [], {
+    await exec.exec("hdiutil", ['attach', '-nomount', '-noverify', cpio], {
       listeners: {
         stdout: (s) => {
           mdataDisk += s;
+        },
+        stderr: (s) => {
+          // for debugging the failed attach
+          core.error(s);
         }
       }
     });
