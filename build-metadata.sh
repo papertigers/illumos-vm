@@ -36,8 +36,8 @@ EOF
 
 echo omnios > "$TOP/ILLUMOSVM/cpio/nodename"
 cd "$TOP/ILLUMOSVM/cpio"
-# macOS versions are very picky it seems....dmg works on 11.2.1 but not 10.15.7
-find . -type f | cpio --quiet -B -o -O "$TOP/ILLUMOSVM_TMP/metadata.img"
+find . -type f | cpio --quiet -o -O "$TOP/ILLUMOSVM_TMP/metadata.img"
+truncate -s 1M "$TOP/ILLUMOSVM_TMP/metadata.img"
 ls -lh "$TOP/ILLUMOSVM_TMP/metadata.img"
 file "$TOP/ILLUMOSVM_TMP/metadata.img"
 hdiutil imageinfo -verbose "$TOP/ILLUMOSVM_TMP/metadata.img"

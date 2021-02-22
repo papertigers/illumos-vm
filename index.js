@@ -82,6 +82,7 @@ async function setup(nat, mem) {
     fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"), "StrictHostKeyChecking=accept-new\n");
 
 
+    await exec.exec("brew install -qf truncate", [], { silent: true });
     await exec.exec("brew install -qf tesseract", [], { silent: true });
     await exec.exec("pip3 install -q pytesseract", [], { silent: true });
 
