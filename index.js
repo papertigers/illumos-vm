@@ -101,7 +101,7 @@ async function setup(nat, mem) {
     await exec.exec("chmod +x " + mdataScript);
     await exec.exec(mdataScript);
 
-    cpio = workingDir + "/ILLUMOSVM_TMP/metadata.iso"
+    cpio = workingDir + "/ILLUMOSVM_TMP/metadata.img"
     let mdataDisk = "";
     await exec.exec("hdiutil", ['attach', '-nomount', '-noverify', cpio], {
       listeners: {
