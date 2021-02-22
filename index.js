@@ -12,7 +12,7 @@ async function sleep(ms) {
 async function execSSH(cmd, desp = "") {
   core.info(desp);
   core.info("exec ssh: " + cmd);
-  await exec.exec("ssh -t freebsd", [], { input: cmd });
+  await exec.exec("ssh -t omnios", [], { input: cmd });
 }
 
 
