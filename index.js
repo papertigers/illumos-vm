@@ -101,7 +101,7 @@ async function setup(nat, mem) {
     await exec.exec("chmod +x " + mdataScript);
     await exec.exec(mdataScript);
 
-    cpio = workingDir + "/ILLUMOSVM_TMP/metadata.dmg"
+    cpio = workingDir + "/ILLUMOSVM_TMP/metadata.iso"
     let mdataDisk = "";
     await exec.exec("hdiutil", ['attach', '-nomount', '-noverify', cpio], {
       listeners: {
@@ -116,7 +116,6 @@ async function setup(nat, mem) {
     });
 
     let sshHome = path.join(process.env["HOME"], ".ssh");
-    let authorized_keys = path.join(sshHome, "authorized_keys");
     fs.appendFileSync(path.join(sshHome, "config"), "SendEnv   CI  GITHUB_* \n");
     await exec.exec("chmod 700 " + sshHome);
 

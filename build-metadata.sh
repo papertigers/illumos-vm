@@ -36,9 +36,8 @@ EOF
 
 echo omnios > "$TOP/ILLUMOSVM/cpio/nodename"
 cd "$TOP/ILLUMOSVM/cpio"
-# macOS seems to want the dmg extension...
-find . -type f | cpio --quiet -o -O "$TOP/ILLUMOSVM_TMP/metadata.cpio"
-mv "$TOP/ILLUMOSVM_TMP/metadata.cpio" "$TOP/ILLUMOSVM_TMP/metadata.dmg"
-ls -lh "$TOP/ILLUMOSVM_TMP/metadata.dmg"
-file "$TOP/ILLUMOSVM_TMP/metadata.dmg"
+# macOS versions are very picky it seems....dmg works on 11.2.1 but not 10.15.7
+find . -type f | cpio --quiet -o -O "$TOP/ILLUMOSVM_TMP/metadata.iso"
+ls -lh "$TOP/ILLUMOSVM_TMP/metadata.iso"
+file "$TOP/ILLUMOSVM_TMP/metadata.iso"
 cd "$TOP"
