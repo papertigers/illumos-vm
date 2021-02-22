@@ -88,8 +88,9 @@ async function setup(nat, mem) {
 
 
     await exec.exec("brew install -qf truncate", [], { silent: true });
-    await exec.exec("brew install -qf tesseract", [], { silent: true });
-    await exec.exec("pip3 install -q pytesseract", [], { silent: true });
+    await exec.exec("brew install -qf cpio", [], { silent: true });
+    //await exec.exec("brew install -qf tesseract", [], { silent: true });
+    //await exec.exec("pip3 install -q pytesseract", [], { silent: true });
 
     let workingDir = __dirname;
 
