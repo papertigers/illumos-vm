@@ -23,8 +23,8 @@ async function getScreenText(vmName) {
   await exec.exec("sudo chmod 666 " + png);
   let output = "";
   await exec.exec("pytesseract  " + png, [], {
+    silent: true,
     listeners: {
-      silent: true,
       stdout: (s) => {
         output += s;
       }
@@ -86,15 +86,12 @@ async function setup(nat, mem) {
     fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
         "StrictHostKeyChecking=accept-new\n");
 
-
-    await exec.exec("brew install -qf truncate", [], { silent: true });
-    await exec.exec("brew install -qf cpio", [], { silent: true });
     await exec.exec("brew install -qf tesseract", [], { silent: true });
     await exec.exec("pip3 install -q pytesseract", [], { silent: true });
 
     let workingDir = __dirname;
 
-    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.2/omnios-r151036.7z";
+    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.4/omnios-r151036.7z";
 
     core.info("Downloading image: " + url);
     let img = await tc.downloadTool(url);
@@ -104,21 +101,14 @@ async function setup(nat, mem) {
     await io.mv(img, s7z);
     await exec.exec("7z e " + s7z + "  -o" + workingDir);
 
-    let mdataScript = workingDir + "/build-metadata.sh"
-    await exec.exec("chmod +x " + mdataScript);
-    await exec.exec(mdataScript);
-
     let sshHome = path.join(process.env["HOME"], ".ssh");
     fs.appendFileSync(path.join(sshHome, "config"),
         "SendEnv   CI  GITHUB_* \n");
     await exec.exec("chmod 700 " + sshHome);
 
-
+    let vmName = "omnios";
     let ova = "omnios-r151036.ova";
     await vboxmanage("", "import", path.join(workingDir, ova));
-
-
-    let vmName = "omnios";
 
     if (nat) {
       let nats = nat.split("\n").filter(x => x !== "");
@@ -143,25 +133,11 @@ async function setup(nat, mem) {
       };
     }
 
-
-    let mdataVmdk = workingDir + "/ILLUMOSVM_TMP/cpio.vmdk";
-    let cpio = workingDir + "/ILLUMOSVM_TMP/metadata.img"
-    // attach the illumos metadata-agent cpio archive to seed the guest VM
-    await vboxmanage("", "internalcommands", "  createrawvmdk -filename " +
-        mdataVmdk + " -rawdisk " + cpio);
-    await vboxmanage(vmName, "storageattach",
-        "  --storagectl SATA --port 1 --device 0 --type hdd --medium " +
-        mdataVmdk);
-
     if (mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
     }
 
     await vboxmanage(vmName, "modifyvm", " --cpus 3");
-
-    await vboxmanage(vmName, "showvminfo", "");
-
-    await exec.exec("sudo cat", ["/var/root/VirtualBox VMs/omnios/omnios.vbox"]);
 
     await vboxmanage(vmName, "startvm", " --type headless");
 
