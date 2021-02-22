@@ -12,15 +12,16 @@ async function sleep(ms) {
 async function execSSH(cmd, desp = "") {
   core.info(desp);
   core.info("exec ssh: " + cmd);
-  await exec.exec("ssh -t omnios", [], { input: cmd });
+  await exec.exec("ssh -vvv -t omnios", [], { input: cmd });
 }
 
 
 
 async function getScreenText(vmName) {
   let png = path.join(__dirname, "/screen.png");
-  await vboxmanage(vmName, "controlvm", "screenshotpng  " + png);
-  await exec.exec("sudo chmod 666 " + png);
+  await exec.exec("sudo vboxmanage",
+    ["controlvm", vmName, "screenshotpng", png], { silent: true } );
+  await exec.exec("sudo chmod 666 " + png, [], { silent: true });
   let output = "";
   await exec.exec("pytesseract  " + png, [], {
     silent: true,
@@ -37,7 +38,6 @@ async function waitFor(vmName, tag) {
 
   let slept = 0;
   while (true) {
-    slept += 1;
     if (slept >= 300) {
       throw new Error("Timeout can not boot");
     }
@@ -51,7 +51,10 @@ async function waitFor(vmName, tag) {
         await sleep(1000);
         return true;
       } else {
-        core.info("Checking, please wait....");
+        if ((slept % 10) === 0) {
+            core.info("Sleep counter: " + slept +
+                " - Checking, please wait....");
+        }
       }
     } else {
       if (!output.trim()) {
@@ -61,6 +64,8 @@ async function waitFor(vmName, tag) {
         core.info("Checking, please wait....");
       }
     }
+
+    slept += 1;
 
   }
 
@@ -84,7 +89,7 @@ async function setup(nat, mem) {
     fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
         " Port 2222" + "\n");
     fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
-        "StrictHostKeyChecking=accept-new\n");
+        " StrictHostKeyChecking=accept-new\n");
 
     await exec.exec("brew install -qf tesseract", [], { silent: true });
     await exec.exec("pip3 install -q pytesseract", [], { silent: true });
