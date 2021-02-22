@@ -128,7 +128,7 @@ async function setup(nat, mem) {
 
 
     let vmName = "omnios";
-    await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 file /tmp/omnios.com1");
+    await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 server /tmp/omnios.com1");
 
     if (nat) {
       let nats = nat.split("\n").filter(x => x !== "");
@@ -169,10 +169,26 @@ async function setup(nat, mem) {
 
     await vboxmanage(vmName, "modifyvm", " --cpus 3");
 
+    await vboxmanage(vmName, "showvminfo", "");
+
     await vboxmanage(vmName, "startvm", " --type headless");
 
     core.info("First boot");
-    await exec.exec(sercons + " /tmp/omnios.com1");
+    let output = "";
+    await exec.exec(sercons + " /tmp/omnios.com1", [], {
+      listeners: {
+        stdout: (s) => {
+          core.debug(s.toString());
+        }
+        // XXX stdline might work?
+        stdline: (s) => {
+          core.debug(s.toString());
+        }
+        stderr: (s) => {
+          core.debug(s.toString());
+        }
+      }
+    });
 
 
     // Finally execute the runner workflow
