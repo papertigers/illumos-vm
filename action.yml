@@ -8,13 +8,13 @@ inputs:
     description: 'The CI command to run'
     required: true
   envs:
-    description: 'The envs to pass into FreeBSD vm'
+    description: 'The envs to pass into illumo vm'
     required: false
   mem:
     description: 'Set the memory size of the vm'
     required: false
   nat:
-    description: 'The NAT ports to FreeBSD vm'
+    description: 'The NAT ports to illumos vm'
     required: false
 branding:
   icon: 'activity'

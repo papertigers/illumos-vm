@@ -6,7 +6,7 @@ on: [push]
 jobs:
   testfreebsd:
     runs-on: macos-latest
-    name: A job to run test FreeBSD
+    name: A job to run against illumos
     env:
       MYTOKEN : ${{ secrets.MYTOKEN }}
       MYTOKEN2: "value2"

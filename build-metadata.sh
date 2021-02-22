@@ -4,12 +4,14 @@
 
 TOP=$(cd "$(dirname "$0")" && pwd)
 
+mkdir "$TOP/ILLUMOSVM_TMP"
+mkdir -p "$HOME/.ssh"
 ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -q -N ""
 
-mkdir -p "$TOP/input/cpio"
-cp "$HOME/.ssh/authorized_keys" "$TOP/input/cpio/authorized_keys"
+mkdir -p "$TOP/ILLUMOSVM/cpio"
+cp "$HOME/.ssh/authorized_keys" "$TOP/ILLUMOSVM/cpio/authorized_keys"
 
-cat >"$TOP/input/cpio/firstboot.sh" <<EOF
+cat >"$TOP/ILLUMOSVM/cpio/firstboot.sh" <<EOF
 #!/bin/bash
 set -o errexit
 set -o pipefail
@@ -30,8 +32,8 @@ echo 'Just a moment...' >/dev/msglog
 exit 0
 EOF
 
-echo omnios > "$TOP/input/cpio/nodename"
-cd "$TOP/input/cpio"
+echo omnios > "$TOP/ILLUMOSVM/cpio/nodename"
+cd "$TOP/ILLUMOSVM/cpio"
 # macOS seems to want the dmg extension...
-find . -type f | cpio --quiet -o -O "$TOP/tmp/metadata.dmg"
+find . -type f | cpio --quiet -o -O "$TOP/ILLUMOSVM_TMP/metadata.dmg"
 cd "$TOP"
