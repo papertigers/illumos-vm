@@ -151,7 +151,7 @@ async function setup(nat, mem) {
 
     let mdataVmdk = workingDir + "/cpio.vmdk";
     // attach the illumos metadata-agent cpio archive to seed the guest VM
-    await vboxmanage("", "internalcommands", " createrawvmdk -filename " + vdataVmdk + " -rawdisk " + mdataDisk);
+    await vboxmanage("", "internalcommands", " createrawvmdk -filename " + mdataVmdk + " -rawdisk " + mdataDisk);
     await vboxmanage(vmName, "storageattach", " --storagectl SATA --port 1 --device 0 --type hdd --medium " + mdataVmdk);
 
     if (mem) {
