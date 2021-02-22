@@ -171,6 +171,8 @@ async function setup(nat, mem) {
 
     await vboxmanage(vmName, "showvminfo", "");
 
+    await exec.exec("sudo cat", ["/var/root/VirtualBox VMs/omnios/omnios.vbox"]);
+
     await vboxmanage(vmName, "startvm", " --type headless");
 
     core.info("First boot");
@@ -179,11 +181,11 @@ async function setup(nat, mem) {
       listeners: {
         stdout: (s) => {
           core.debug(s.toString());
-        }
+        },
         // XXX stdline might work?
         stdline: (s) => {
           core.debug(s.toString());
-        }
+        },
         stderr: (s) => {
           core.debug(s.toString());
         }
