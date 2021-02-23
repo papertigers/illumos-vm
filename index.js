@@ -115,29 +115,28 @@ async function setup(nat, mem) {
     let ova = "omnios-r151036.ova";
     await vboxmanage("", "import", path.join(workingDir, ova));
 
-    // XXX causing issues?
-    //if (nat) {
-    //  let nats = nat.split("\n").filter(x => x !== "");
-    //  for (let element of nats) {
-    //    core.info("Add nat: " + element);
-    //    let segs = element.split(":");
-    //    if (segs.length === 3) {
-    //      //udp:"8081": "80"
-    //      let proto = segs[0].trim().trim('"');
-    //      let hostPort = segs[1].trim().trim('"');
-    //      let vmPort = segs[2].trim().trim('"');
-    //      await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
-    //        proto + ",," + hostPort + ",," + vmPort + "'");
+    if (nat) {
+      let nats = nat.split("\n").filter(x => x !== "");
+      for (let element of nats) {
+        core.info("Add nat: " + element);
+        let segs = element.split(":");
+        if (segs.length === 3) {
+          //udp:"8081": "80"
+          let proto = segs[0].trim().trim('"');
+          let hostPort = segs[1].trim().trim('"');
+          let vmPort = segs[2].trim().trim('"');
+          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
+            proto + ",," + hostPort + ",," + vmPort + "'");
 
-    //    } else if (segs.length === 2) {
-    //      let proto = "tcp"
-    //      let hostPort = segs[0].trim().trim('"');
-    //      let vmPort = segs[1].trim().trim('"');
-    //      await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
-    //        proto + ",," + hostPort + ",," + vmPort + "'");
-    //    }
-    //  };
-    //}
+        } else if (segs.length === 2) {
+          let proto = "tcp"
+          let hostPort = segs[0].trim().trim('"');
+          let vmPort = segs[1].trim().trim('"');
+          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
+            proto + ",," + hostPort + ",," + vmPort + "'");
+        }
+      };
+    }
 
     if (mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
@@ -151,6 +150,12 @@ async function setup(nat, mem) {
 
     let loginTag = "omnios console login:";
     await waitFor(vmName, loginTag);
+
+    // test manually calling ssh
+    await exec.exec("ls -l " + sshHome);
+    await exec.exec("cat " + sshHome + "/config");
+    await exec.exec("cat " + sshHome + "/known_hosts");
+    await exec.exec("ssh -vvv -t omnios uname -a");
 
     // Finally execute the runner workflow
     let cmd1 = "mkdir -p /Users/runner/work && ln -s /Users/runner/work/  work";
