@@ -115,28 +115,29 @@ async function setup(nat, mem) {
     let ova = "omnios-r151036.ova";
     await vboxmanage("", "import", path.join(workingDir, ova));
 
-    if (nat) {
-      let nats = nat.split("\n").filter(x => x !== "");
-      for (let element of nats) {
-        core.info("Add nat: " + element);
-        let segs = element.split(":");
-        if (segs.length === 3) {
-          //udp:"8081": "80"
-          let proto = segs[0].trim().trim('"');
-          let hostPort = segs[1].trim().trim('"');
-          let vmPort = segs[2].trim().trim('"');
-          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
-            proto + ",," + hostPort + ",," + vmPort + "'");
+    // XXX causing issues?
+    //if (nat) {
+    //  let nats = nat.split("\n").filter(x => x !== "");
+    //  for (let element of nats) {
+    //    core.info("Add nat: " + element);
+    //    let segs = element.split(":");
+    //    if (segs.length === 3) {
+    //      //udp:"8081": "80"
+    //      let proto = segs[0].trim().trim('"');
+    //      let hostPort = segs[1].trim().trim('"');
+    //      let vmPort = segs[2].trim().trim('"');
+    //      await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
+    //        proto + ",," + hostPort + ",," + vmPort + "'");
 
-        } else if (segs.length === 2) {
-          let proto = "tcp"
-          let hostPort = segs[0].trim().trim('"');
-          let vmPort = segs[1].trim().trim('"');
-          await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
-            proto + ",," + hostPort + ",," + vmPort + "'");
-        }
-      };
-    }
+    //    } else if (segs.length === 2) {
+    //      let proto = "tcp"
+    //      let hostPort = segs[0].trim().trim('"');
+    //      let vmPort = segs[1].trim().trim('"');
+    //      await vboxmanage(vmName, "modifyvm", "  --natpf1 '" + hostPort + "," +
+    //        proto + ",," + hostPort + ",," + vmPort + "'");
+    //    }
+    //  };
+    //}
 
     if (mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
