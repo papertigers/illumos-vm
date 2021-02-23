@@ -151,11 +151,8 @@ async function setup(nat, mem) {
     let loginTag = "omnios console login:";
     await waitFor(vmName, loginTag);
 
-    // test manually calling ssh
-    await exec.exec("ls -l " + sshHome);
-    await exec.exec("cat " + sshHome + "/config");
-    await exec.exec("cat " + sshHome + "/known_hosts");
-    await exec.exec("ssh -vvv -t omnios uname -a");
+    // XXX need an smf service that outputs when ssh is up
+    await sleep(1000 * 60 * 2);
 
     // Finally execute the runner workflow
     let cmd1 = "mkdir -p /Users/runner/work && ln -s /Users/runner/work/  work";
