@@ -152,7 +152,7 @@ async function setup(nat, mem) {
     await waitFor(vmName, loginTag);
 
     // XXX need an smf service that outputs when ssh is up
-    await sleep(1000 * 60);
+    await sleep(1000 * 60 * 2);
 
     // Finally execute the runner workflow
     let cmd1 = "mkdir -p /Users/runner/work && ln -s /Users/runner/work/  work";
