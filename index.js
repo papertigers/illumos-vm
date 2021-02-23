@@ -195,7 +195,7 @@ async function main() {
   console.log("run: " + run);
 
   try {
-    await exec.exec("ssh omnios sh -c 'cd $GITHUB_WORKSPACE && exec \"$SHELL\"'", [], { input: run });
+    await exec.exec("ssh omnios sh -c 'cd $GITHUB_WORKSPACE && exec bash'", [], { input: run });
   } catch (error) {
     core.setFailed(error.message);
   } finally {
