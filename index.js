@@ -12,7 +12,7 @@ async function sleep(ms) {
 async function execSSH(cmd, desp = "") {
   core.info(desp);
   core.info("exec ssh: " + cmd);
-  await exec.exec("ssh -vvv -t omnios", [], { input: cmd });
+  await exec.exec("ssh -t omnios", [], { input: cmd });
 }
 
 
@@ -152,7 +152,7 @@ async function setup(nat, mem) {
     await waitFor(vmName, loginTag);
 
     // XXX need an smf service that outputs when ssh is up
-    await sleep(1000 * 60 * 2);
+    await sleep(1000 * 60);
 
     // Finally execute the runner workflow
     let cmd1 = "mkdir -p /Users/runner/work && ln -s /Users/runner/work/  work";
