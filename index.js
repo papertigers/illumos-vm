@@ -113,7 +113,7 @@ async function setup(nat, mem) {
 
     let vmName = "omnios";
     let ova = "omnios-r151038.ova";
-    let diskPath = "/var/root/VirtualBox VMs/omnios/omnios-r151038-disk001.vmdk";
+    let diskPath = "/var/root/VirtualBox\ VMs/omnios/omnios-r151038-disk001.vmdk";
     await vboxmanage("", "import", path.join(workingDir, ova));
 
     if (nat) {
