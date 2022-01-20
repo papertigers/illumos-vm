@@ -143,15 +143,7 @@ async function setup(nat, mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
     }
 
-    // XXX Ditch the Sata controller in favor of a faster nvme controller?
-    await vboxmanage(vmName, "storageattach", " --storagectl SATA --port 0 --device 0 --type hdd --medium none" );
-    await vboxmanage("", "closemedium", " disk " + diskPath );
-    await vboxmanage(vmName, "storagectl", " --name SATA --remove" );
-    await vboxmanage(vmName, "storagectl", " --add pcie --controller NVMe --name NVME" );
-    await vboxmanage(vmName, "storageattach", " --storagectl NVME --port 0 --device 0 --type hdd --medium " + diskPath );
-    await vboxmanage(vmName, "storagectl", " --name NVME --hostiocache on" );
-    // XXX
-
+    await vboxmanage(vmName, "storagectl", " --name SATA --hostiocache on" );
 
     await vboxmanage(vmName, "modifyvm", " --cpus 3");
 
