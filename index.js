@@ -113,6 +113,7 @@ async function setup(nat, mem) {
 
     let vmName = "omnios";
     let ova = "omnios-r151038.ova";
+    let diskPath = "/var/root/VirtualBox VMs/omnios/omnios-r151038-disk001.vmdk";
     await vboxmanage("", "import", path.join(workingDir, ova));
 
     if (nat) {
@@ -141,6 +142,14 @@ async function setup(nat, mem) {
     if (mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
     }
+
+    // XXX Ditch the Sata controller in favor of a faster nvme controller?
+    await vboxmanage(vmName, "storagectl", " --name SATA --remove" );
+    await vboxmanage(vmName, "storagectl", " --add pcie --controller NVMe --name NVME" );
+    await vboxmanage(vmName, "storageattach", " --storagectl NVME --port 0 --device -0 --type hdd --medium " + diskPath );
+    await vboxmanage(vmName, "storagectl", " --name NVME --hostiocache on" );
+    // XXX
+
 
     await vboxmanage(vmName, "modifyvm", " --cpus 3");
 
