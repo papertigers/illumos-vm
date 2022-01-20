@@ -96,13 +96,13 @@ async function setup(nat, mem) {
 
     let workingDir = __dirname;
 
-    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.4/omnios-r151036.7z";
+    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.5/omnios-r151038.7z";
 
     core.info("Downloading image: " + url);
     let img = await tc.downloadTool(url);
     core.info("Downloaded file: " + img);
 
-    let s7z = workingDir + "/omnios-r151036.7z";
+    let s7z = workingDir + "/omnios-r151038.7z";
     await io.mv(img, s7z);
     await exec.exec("7z e " + s7z + "  -o" + workingDir);
 
@@ -112,7 +112,7 @@ async function setup(nat, mem) {
     await exec.exec("chmod 700 " + sshHome);
 
     let vmName = "omnios";
-    let ova = "omnios-r151036.ova";
+    let ova = "omnios-r151038.ova";
     await vboxmanage("", "import", path.join(workingDir, ova));
 
     if (nat) {
