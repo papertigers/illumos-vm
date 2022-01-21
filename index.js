@@ -91,13 +91,21 @@ async function setup(nat, mem) {
     fs.appendFileSync(path.join(process.env["HOME"], "/.ssh/config"),
         " StrictHostKeyChecking=accept-new\n");
 
-    await exec.exec("brew install -qf tesseract", [], { silent: true });
-    await exec.exec("pip3 install -q pytesseract", [], { silent: true });
+    //await exec.exec("brew install -qf tesseract", [], { silent: true });
+    //await exec.exec("pip3 install -q pytesseract", [], { silent: true });
 
     let workingDir = __dirname;
+    let com1 = "/tmp/omnios.com1";
 
-    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.5/omnios-r151038.7z";
+    let ghaSerial = "http://lightsandshapes.com/gha-serial"
+    core.info("Downloading gha-serial: " + ghaSerial);
+    let ghas = await tc.downloadTool(ghaSerial);
+    core.info("Downloaded file: " + ghas);
+    let serial = workingDir + "/gha-serial";
+    await io.mv(ghas, serial);
+    await exec.exec("chmod +x", [serial]);
 
+    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.9/omnios-r151038.7z";
     core.info("Downloading image: " + url);
     let img = await tc.downloadTool(url);
     core.info("Downloaded file: " + img);
@@ -113,7 +121,7 @@ async function setup(nat, mem) {
 
     let vmName = "omnios";
     let ova = "omnios-r151038.ova";
-    let diskPath = '"/var/root/VirtualBox VMs/omnios/omnios-r151038-disk001.vmdk"';
+
     await vboxmanage("", "import", path.join(workingDir, ova));
 
     if (nat) {
@@ -147,12 +155,22 @@ async function setup(nat, mem) {
 
     await vboxmanage(vmName, "modifyvm", " --cpus 3");
 
+    await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 server " + com1 );
+
     await vboxmanage(vmName, "startvm", " --type headless");
 
     core.info("First boot");
 
-    let loginTag = "omnios console login:";
-    await waitFor(vmName, loginTag);
+    //let loginTag = "omnios console login:";
+    //await waitFor(vmName, loginTag);
+
+    await exec.exec(serial, ["-s", com1, "-b", "115200"], {
+      listeners: {
+        stdout: (s) => {
+          output += s;
+        }
+      }
+    });
 
     // XXX need an smf service that outputs when ssh is up
     await sleep(1000 * 60 * 2);
