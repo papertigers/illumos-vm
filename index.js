@@ -150,27 +150,28 @@ async function setup(nat, mem) {
     if (mem) {
       await vboxmanage(vmName, "modifyvm", "  --memory " + mem);
     }
-
     await vboxmanage(vmName, "storagectl", " --name SATA --hostiocache on" );
 
     await vboxmanage(vmName, "modifyvm", " --cpus 3");
 
-    await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 server " + com1 );
+    await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 client " + com1 );
 
-    await vboxmanage(vmName, "startvm", " --type headless");
 
-    core.info("First boot");
-
-    //let loginTag = "omnios console login:";
+    let loginTag = "omnios console login:";
     //await waitFor(vmName, loginTag);
 
-    await exec.exec(serial, ["-s", com1, "-b", "115200"], {
+    let serialOutput = "";
+    let serialWaiter = exec.exec(serial, ["-s", com1, "-t", loginTag], {
       listeners: {
         stdout: (s) => {
-          output += s;
+          serialOutput += s;
         }
       }
     });
+
+    core.info("First boot");
+    await vboxmanage(vmName, "startvm", " --type headless");
+    await serialWaiter;
 
     // XXX need an smf service that outputs when ssh is up
     await sleep(1000 * 60 * 2);
