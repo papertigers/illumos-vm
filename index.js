@@ -16,63 +16,6 @@ async function execSSH(cmd, desp = "") {
 }
 
 
-
-async function getScreenText(vmName) {
-  let png = path.join(__dirname, "/screen.png");
-  await exec.exec("sudo vboxmanage",
-    ["controlvm", vmName, "screenshotpng", png], { silent: true } );
-  await exec.exec("sudo chmod 666 " + png, [], { silent: true });
-  let output = "";
-  await exec.exec("pytesseract  " + png, [], {
-    silent: true,
-    listeners: {
-      stdout: (s) => {
-        output += s;
-      }
-    }
-  });
-  return output;
-}
-
-async function waitFor(vmName, tag) {
-
-  let slept = 0;
-  while (true) {
-    if (slept >= 300) {
-      throw new Error("Timeout can not boot");
-    }
-    await sleep(1000);
-
-    let output = await getScreenText(vmName);
-
-    if (tag) {
-      if (output.includes(tag)) {
-        core.info("OK");
-        await sleep(1000);
-        return true;
-      } else {
-        if ((slept % 10) === 0) {
-            core.info("Sleep counter: " + slept +
-                " - Checking, please wait....");
-        }
-      }
-    } else {
-      if (!output.trim()) {
-        core.info("OK");
-        return true;
-      } else {
-        core.info("Checking, please wait....");
-      }
-    }
-
-    slept += 1;
-
-  }
-
-  return false;
-}
-
-
 async function vboxmanage(vmName, cmd, args = "") {
   await exec.exec("sudo  vboxmanage " + cmd + "   " + vmName + "   " + args);
 }
@@ -160,14 +103,7 @@ async function setup(nat, mem) {
     let loginTag = "omnios console login:";
     //await waitFor(vmName, loginTag);
 
-    let serialOutput = "";
-    let serialWaiter = exec.exec(serial, ["-s", com1, "-t", loginTag], {
-      listeners: {
-        stdout: (s) => {
-          serialOutput += s;
-        }
-      }
-    });
+    let serialWaiter = exec.exec(serial, ["-s", com1, "-t", loginTag], {});
 
     core.info("First boot");
     await vboxmanage(vmName, "startvm", " --type headless");
