@@ -48,7 +48,7 @@ async function setup(nat, mem) {
     await io.mv(ghas, serial);
     await exec.exec("chmod +x", [serial]);
 
-    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.9/omnios-r151038.7z";
+    let url = "https://github.com/papertigers/gh-illumos-builder/releases/download/v0.0.10/omnios-r151038.7z";
     core.info("Downloading image: " + url);
     let img = await tc.downloadTool(url);
     core.info("Downloaded file: " + img);
@@ -100,17 +100,13 @@ async function setup(nat, mem) {
     await vboxmanage(vmName, "modifyvm", " --uart1 0x3F8 4 --uartmode1 client " + com1 );
 
 
-    let loginTag = "omnios console login:";
-    //await waitFor(vmName, loginTag);
+    let loginTag = "GITHUB-ACTIONS-READY";
 
     let serialWaiter = exec.exec(serial, ["-s", com1, "-t", loginTag], {});
 
     core.info("First boot");
     await vboxmanage(vmName, "startvm", " --type headless");
     await serialWaiter;
-
-    // XXX need an smf service that outputs when ssh is up
-    await sleep(1000 * 60 * 2);
 
     // Finally execute the runner workflow
     let cmd1 = "mkdir -p /Users/runner/work && ln -s /Users/runner/work/  work";
